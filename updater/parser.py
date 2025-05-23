@@ -94,7 +94,7 @@ async def parse_vless_uri(vless_uri: str, config_path: str, http_port: int) -> N
         'log': {
             'disabled': False,
             'level': "warn",
-            'output': 'updater/logs/sing-box.log',
+            'output': '/app/logs/sing-box.log',
             'timestamp': True
         },
         'inbounds': [

@@ -16,7 +16,7 @@ from parser import parse_vless_uri
 
 
 logger_file = logging.handlers.TimedRotatingFileHandler(
-    filename="updater/logs/py.log",
+    filename="logs/py.log",
     when="midnight",
     interval=1,
     backupCount=5,   # Keep up to 5 log files
@@ -48,7 +48,7 @@ async def download_file(url: str, local_path: str) -> None:
         try:
             response = await client.get(url)
             response.raise_for_status()
-            logger.debug("File was successfully fetched")
+            logger.info("File was successfully fetched")
         except httpx.HTTPStatusError as e:
             logger.critical(f"File fetch error {str(e)}")
             raise e
@@ -81,9 +81,9 @@ async def measure_server_speed(proxy: str, timeout: int = 5) -> float:
                     
             delta = time.perf_counter() - start
             speed_mbps = (total_bytes * 8) / (delta * 1_000_000)
-            logger.info(f"Server speed: {speed_mbps}mbps")
             return speed_mbps
-    except:
+    except Exception as e:
+        logger.warning("Unable to measure server speed")
         return 0.0
     
 
@@ -129,21 +129,23 @@ async def filter_configs(
                 
                     try:
                         # Starting sing-box
-                        await asyncio.create_subprocess_exec("sing-box", "run", "-c", config_path)
+                        await asyncio.create_subprocess_exec("/app/sing-box", "run", "-c", config_path)
                         await asyncio.sleep(0.5)  # To make sure that the sing-box is running
                 
                         response = await client.get("https://www.cloudflare.com")
                         response.raise_for_status()
                         
-                        if await measure_server_speed(proxy) < int(os.getenv('SPEED_LIMIT')):
+                        server_speed = await measure_server_speed(proxy)
+                        logger.info(f"Server speed: {server_speed} - {config_uri.strip()}")
+                        if server_speed < int(os.getenv('SPEED_LIMIT')):
                             logger.warning(f"Slow config: {config_uri.strip()}")
                             return
                         
                         await output_file.write(config_uri)
-                        logger.debug(f"Fast-working config: {config_uri.strip()}")
+                        logger.info(f"Passed: {config_uri.strip()}")
                     
-                    except (httpx.ConnectTimeout, httpx.ProxyError, httpx.ConnectError):
-                        logger.warning(f"Non-working config: {config_uri.strip()}")
+                    except httpx.HTTPError as e:
+                        logger.warning(f"Non-working config: {config_uri.strip()}: {e}")
                     
                     finally:
                         os.remove(config_path)
@@ -153,7 +155,7 @@ async def filter_configs(
             tasks.append(check_config(line))
         
         await asyncio.gather(*tasks)
-        logger.debug("Configs were successfully wrote to the file")
+        logger.info("Configs have been written to the file")
         
         
         
@@ -187,7 +189,7 @@ async def update_file(url: str, local_path: str) -> None:
         
         response = await client.put(url, headers=headers, json=payload)
         response.raise_for_status()
-        logger.debug("File was successfully updated")
+        logger.info("File was successfully updated")
 
 
 
