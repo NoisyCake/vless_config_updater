@@ -3,7 +3,8 @@ import socket
 
 def get_free_port() -> int:
     '''
-    Gets the port that is free at the time of the function call.
+    Gets the port that is free at the time of the function call.\n
+    Returns port number.
     '''
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind(('', 0))

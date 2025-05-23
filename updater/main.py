@@ -29,7 +29,7 @@ formatter = logging.Formatter(
 logger_file.setFormatter(formatter)
 logger = logging.getLogger()
 logger.handlers.clear()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 logger.addHandler(logger_file)
 
 load_dotenv()
