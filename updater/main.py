@@ -177,9 +177,17 @@ async def update_file(url: str, local_path: str) -> None:
         
         async with aiofiles.open(local_path, encoding='utf-8') as file:
             content =  await file.read()
-            
-        encoded_content = base64.b64encode(content.encode()).decode()
         
+        # Check numbers of non-empty lines
+        config_limit = int(os.getenv('CONFIGS_LIMIT'))
+        lines = [line for line in content.splitlines() if line.strip()]
+        if len(lines) < config_limit:
+            logger.warning(f"Skipping pushing file: has less than {config_limit} configs")
+            return
+        logger.debug(f"File has more that {config_limit} configs")
+
+        encoded_content = base64.b64encode(content.encode()).decode()
+
         payload = {
             "message": "Update config file",
             "content": encoded_content,

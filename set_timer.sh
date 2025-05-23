@@ -22,7 +22,7 @@ After=network.target
 [Service]
 Type=oneshot
 WorkingDirectory=${PROJECT_DIR}
-ExecStart=${DOCKER_PATH} run --rm --env-file .env -v ${PROJECT_DIR}/logs:/app/logs noisycake/vless_config_updater:1.0.0
+ExecStart=${DOCKER_PATH} run --rm --env-file .env -v ${PROJECT_DIR}/logs:/app/logs noisycake/vless_config_updater
 EOF
 echo "Service file was created"
 
