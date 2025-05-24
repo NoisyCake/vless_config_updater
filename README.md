@@ -8,6 +8,8 @@
 # vless_config_updater
 
 A background tool that pulls a public list of URI-like Xray/Sing-box configs and filters out only working VLESS entries.
+
+A detailed description of the project is available on the [author's website](https://noisycake.ru/projects/vless_config_updater/)
 </div>
 
 ## Install & Setup
