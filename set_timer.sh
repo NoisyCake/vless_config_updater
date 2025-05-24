@@ -84,5 +84,5 @@ echo "Log cleaner timer file was created"
 systemctl daemon-reload
 systemctl enable --now vless_config_updater.timer vless_config_updater_log_cleaner.timer
 
-echo "Service is active. Checking:"
+echo "Checking service activity:"
 systemctl status vless_config_updater.timer
